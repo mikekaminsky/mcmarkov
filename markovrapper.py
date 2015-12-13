@@ -16,9 +16,26 @@ def getlyrics(artist):
     lyrics = cur.fetchall()
     return lyrics
 
+class ProbMatrix:
+    """
+        This class holds the probability matrix data crucial to building these models. They take the following form
+        where (x_i, y_j) contains the likelihood of word x_i following the words contained in the tuple y_j
+            x_0 x_1 ... x_n
+        y_0
+        y_1
+        ...
+        y_n
+    """
+    def __init__(self, x, y, order):
+        self.x = x
+        self.y = y
+        self.order = order
+        self.p = np.zeros((len(y), len(x)))
+        
 class MarkovChain:
-    # based on:
-    # https://github.com/superbly/markov_chain/blob/master/MarkovChain.py
+    # TODO:
+    # To choose the next word in the list, cycle through probability matrixes until you 
+    # find one that contains some enty for the word
     def __init__(self, corpus, n_order=1):
         self.n_order = n_order
 
@@ -30,42 +47,38 @@ class MarkovChain:
         self.numerifiedcorpus = [self.wordtonumber[word] for word in corpus]
 
         n_states = len(self.numbertoword) 
-        if n_order == 1:
-            self.x, self.y = range(n_states)
-        else:
-            self.x = range(n_states)
-            self.y = list(it.product(range(n_states), repeat=n_order))
-        nx = len(self.x)
-        ny = len(self.y)
-        self.p = np.zeros((ny, nx))
+
+        self.matrix_list = [] 
+        for i in range(n_order, 0, -1):
+            x = range(n_states)
+            y = list(it.product(range(n_states), repeat=i))
+            p = ProbMatrix(x, y, i)
+            self.matrix_list.append(p)
 
     def fit(self):
         states = self.numerifiedcorpus
-        # Count frequency of different states
-        if self.n_order == 1:
-            for i in xrange(0,len(states)-1):
-                xloc = states[i]
-                yloc = states[i+1]
-                self.p[yloc][xloc] += 1
-        else:
-            for i in xrange(n_order,len(states)):
-                xloc = states[i]
-                yloc = self.y.index(tuple(states[i-n_order:i]))
-                self.p[yloc][xloc] += 1
-        for i in xrange(0, self.p.shape[0]):
-            row = self.p[i]
-            t = row.sum()
-            if t <> 0:
-                self.p[i] = row/t
-        return self.p, self.numbertoword, self.numerifiedcorpus
+        for i in range(0, n_order):
+            thisprob = self.matrix_list[i]
+            thisorder = thisprob.order
+            # Calculate Frequencies
+            for j in xrange(thisorder,len(states)):
+                xloc = states[j]
+                yloc = thisprob.y.index(tuple(states[j-thisorder:j]))
+                thisprob.p[yloc][xloc] += 1
+            # Normalize
+            for j in xrange(0, thisprob.p.shape[0]):
+                row = thisprob.p[j]
+                t = row.sum()
+                if t <> 0:
+                    thisprob.p[j] = row/t
+        return self.matrix_list
 
     #def nextWord(self, precendingtext=''):
 
-
-
 #corpus = getlyrics('eminem')
-corpus = ['a','b','a','a','b','a','b']
+corpus = ['a','b','a','b']
 mc = MarkovChain(corpus, 2)
-myp, myd, myc = mc.fit()
-print myc
-print myp
+mymatlist = mc.fit()
+#myp, myd, myc = mc.fit()
+#print myc
+#print myp
