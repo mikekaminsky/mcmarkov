@@ -1,5 +1,6 @@
 import numpy as np
 import itertools as it
+import random
 
 class ProbMatrix:
     """
@@ -19,8 +20,9 @@ class ProbMatrix:
         
 class MarkovChain:
     # TODO:
-    # To choose the next word in the list, cycle through probability matrixes until you 
-    # find one that contains some enty for the word
+    # Need to be able to take in an enormous corpus that's broken into lines and create the probability matrices.
+    ## To do this, we'll need to have some way of telling it what to do with multiple lines (i.e., don't treat the
+    ## first word of the next line as following the last word of the previous line. 
     def __init__(self, corpus, n_order=1):
         self.n_order = n_order
 
@@ -36,7 +38,7 @@ class MarkovChain:
         n_states = len(self.numbertoword) 
 
         self.matrix_list = [] 
-        for i in range(n_order, 0, -1):
+        for i in range(self.n_order, 0, -1):
             x = range(n_states)
             y = list(it.product(range(n_states), repeat=i))
             p = ProbMatrix(x, y, i)
@@ -44,7 +46,7 @@ class MarkovChain:
 
     def fit(self):
         states = self.numerifiedcorpus
-        for i in range(0, n_order):
+        for i in range(0, self.n_order):
             thisprob = self.matrix_list[i]
             thisorder = thisprob.order
             # Calculate Frequencies
@@ -60,12 +62,50 @@ class MarkovChain:
                     thisprob.p[j] = row/t
         return self.matrix_list
 
-    #def nextWord(self, precendingtext=''):
+    def nextWord(self, precendingtext=[]):
+        # TODO:
+        # Create a separate data structure that stores the *first word* in a line from the corpus, then 
+        # Chooses among *those*
+        if not precendingtext:
+            precendingtext = [random.choice(self.wordtonumber.keys())]
+        precedingnumbers = [self.wordtonumber[word] for word in precendingtext]
 
-#corpus = getlyrics('eminem')
-corpus = ['a','b','a','b']
+        for i in range(0, self.n_order):
+            if self.matrix_list[i].order > len(precedingnumbers):
+                continue
+            if self.matrix_list[i].order < len(precedingnumbers):
+                precedingnumbers = precedingnumbers[-self.matrix_list[i].order:]
+            print("Looking for matches of order " + str(self.matrix_list[i].order))
+            thisprob = self.matrix_list[i]
+            thisorder = thisprob.order
+            if tuple(precedingnumbers) in thisprob.y:
+                probs = thisprob.p[thisprob.y.index(tuple(precedingnumbers)),:]
+            else:
+                continue
+            sample = random.random()
+            maxprob = 0.0
+            maxprobword = None
+            for j in range(0, len(probs)):
+                if probs[j] > maxprob:
+                    maxprob = probs[j]
+                    maxprobword = j
+                if sample > probs[j]:
+                    sample -= probs[j]
+                else:
+                    return self.numbertoword[j]
+            if maxprobword:
+                return self.numbertoword[maxprobword]
+        raise ValueError('No probabilities found :(')
+
+
+corpus = ['a','b','c','a','b','c']
 mc = MarkovChain(corpus, 2)
 mymatlist = mc.fit()
-#myp, myd, myc = mc.fit()
-#print myc
-#print myp
+
+print(mc.nextWord(['a']))
+print(mc.nextWord(['b']))
+print(mc.nextWord(['c']))
+
+# It should look for a match to both a & c first, 
+# and when it doesn't find anything, should return the match for a
+print(mc.nextWord(['a','c']))
