@@ -1,20 +1,5 @@
-import psycopg2
-from collections import defaultdict
-from itertools import count
-from functools import partial
 import numpy as np
 import itertools as it
-
-conn_string = "host='localhost' dbname='rhymes' user='michaelkaminsky'"
-conn = psycopg2.connect(conn_string)
-cur = conn.cursor()
-
-def getlyrics(artist):
-    SQL = "SELECT lyrics from lyrics join songs on lyrics.song_id = songs.id where artist = %s;" # Note: no quotes
-    data = (artist, )
-    cur.execute(SQL, data)
-    lyrics = cur.fetchall()
-    return lyrics
 
 class ProbMatrix:
     """
@@ -44,6 +29,8 @@ class MarkovChain:
         
         # Dictionary for words -> numbers (we need this to create the numerified corpus
         self.wordtonumber = {v: k for k, v in self.numbertoword.items()}
+
+        # This is integer-only version of the corpus we passed in. May make things faster???
         self.numerifiedcorpus = [self.wordtonumber[word] for word in corpus]
 
         n_states = len(self.numbertoword) 
