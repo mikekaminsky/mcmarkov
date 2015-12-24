@@ -44,6 +44,12 @@ class MarkovChain:
             p = ProbMatrix(x, y, i)
             self.matrix_list.append(p)
 
+    def convertwordtonumber(self, word):
+        if word in self.wordtonumber:
+            return self.wordtonumber[word]
+        else:
+            raise ValueError('This word isn''t in the corpus')
+
     def fit(self):
         states = self.numerifiedcorpus
         for i in range(0, self.n_order):
@@ -68,14 +74,13 @@ class MarkovChain:
         # Chooses among *those*
         if not precendingtext:
             precendingtext = [random.choice(self.wordtonumber.keys())]
-        precedingnumbers = [self.wordtonumber[word] for word in precendingtext]
+        precedingnumbers = [self.convertwordtonumber(word) for word in precendingtext]
 
         for i in range(0, self.n_order):
             if self.matrix_list[i].order > len(precedingnumbers):
                 continue
             if self.matrix_list[i].order < len(precedingnumbers):
                 precedingnumbers = precedingnumbers[-self.matrix_list[i].order:]
-            print("Looking for matches of order " + str(self.matrix_list[i].order))
             thisprob = self.matrix_list[i]
             thisorder = thisprob.order
             if tuple(precedingnumbers) in thisprob.y:
@@ -95,4 +100,4 @@ class MarkovChain:
                     return self.numbertoword[j]
             if maxprobword:
                 return self.numbertoword[maxprobword]
-        raise ValueError('No probabilities found :(')
+        return None
