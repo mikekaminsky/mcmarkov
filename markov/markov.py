@@ -5,18 +5,18 @@ import random
 class ProbMatrix:
     """
         This class holds the probability matrix data crucial to building these models. They take the following form
-        where (x_i, y_j) contains the likelihood of word x_i following the words contained in the tuple y_j
-            x_0 x_1 ... x_n
-        y_0
-        y_1
+        where (x_i, y_j) contains the likelihood of word y_i following the words contained in the tuple x_j
+            y_0 y_1 ... y_n
+        x_0
+        x_1
         ...
-        y_n
+        x_n
     """
     def __init__(self, x, y, order):
         self.x = x
         self.y = y
         self.order = order
-        self.p = np.zeros((len(y), len(x)))
+        self.p = np.zeros((len(x), len(y)))
         
 class MarkovChain:
     # TODO:
@@ -39,8 +39,8 @@ class MarkovChain:
 
         self.matrix_list = [] 
         for i in range(self.n_order, 0, -1):
-            x = range(n_states)
-            y = list(it.product(range(n_states), repeat=i))
+            x = list(it.product(range(n_states), repeat=i))
+            y = range(n_states)
             p = ProbMatrix(x, y, i)
             self.matrix_list.append(p)
 
@@ -57,9 +57,9 @@ class MarkovChain:
             thisorder = thisprob.order
             # Calculate Frequencies
             for j in xrange(thisorder,len(states)):
-                xloc = states[j]
-                yloc = thisprob.y.index(tuple(states[j-thisorder:j]))
-                thisprob.p[yloc][xloc] += 1
+                xloc = thisprob.x.index(tuple(states[j-thisorder:j]))
+                yloc = states[j]
+                thisprob.p[xloc][yloc] += 1
             # Normalize
             for j in xrange(0, thisprob.p.shape[0]):
                 row = thisprob.p[j]
@@ -83,8 +83,8 @@ class MarkovChain:
                 precedingnumbers = precedingnumbers[-self.matrix_list[i].order:]
             thisprob = self.matrix_list[i]
             thisorder = thisprob.order
-            if tuple(precedingnumbers) in thisprob.y:
-                probs = thisprob.p[thisprob.y.index(tuple(precedingnumbers)),:]
+            if tuple(precedingnumbers) in thisprob.x:
+                probs = thisprob.p[thisprob.x.index(tuple(precedingnumbers)),:]
             else:
                 continue
             sample = random.random()
