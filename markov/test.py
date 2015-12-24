@@ -21,13 +21,11 @@ class TestMarkovChain(unittest.TestCase):
 
     def setUp(self):
 
-
-        self.corpus =['alpha','beta','gamma','delta','alpha','gamma']
-
-        #self.corpus = [
-                #['alpha','beta','gamma','delta','alpha','gamma'],
-                #['alef','bet','gimel','dalet','alef','gimel']
-                        #]
+        self.corpus = [
+                ['alpha','beta','gamma','delta','alpha','gamma','epsilon'],
+                ['alef','bet','gimel','dalet','alef','gimel']
+                        ]
+        self.flattened_corpus = [item for sublist in self.corpus for item in sublist]
 
     def test_inverse_dictionaries(self):
         """
@@ -47,7 +45,7 @@ class TestMarkovChain(unittest.TestCase):
         """
         mc = MarkovChain(self.corpus, 1)
         self.assertEqual(len(mc.numerifiedcorpus),len(self.corpus))
-        self.assertEqual(len(set(mc.numerifiedcorpus)),len(set(self.corpus)))
+        self.assertEqual(len(set([item for sublist in mc.numerifiedcorpus for item in sublist])),len(set(self.flattened_corpus)))
 
     def test_fits_sum_to_one(self):
         mc = MarkovChain(self.corpus, 1)
@@ -71,7 +69,11 @@ class TestMarkovChain(unittest.TestCase):
         nextw = mc.nextWord(['beta','delta'])
         self.assertEqual(nextw, 'alpha')
 
-
+    def test_probs_stop_across_lines(self):
+        mc = MarkovChain(self.corpus, 3)
+        mc.fit()
+        nextw = mc.nextWord(['alpha','epsilon'])
+        self.assertEqual(nextw, None) # Nothing follows epsilon
 
 if __name__ == '__main__':
     unittest.main()

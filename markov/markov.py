@@ -19,21 +19,18 @@ class ProbMatrix:
         self.p = np.zeros((len(x), len(y)))
         
 class MarkovChain:
-    # TODO:
-    # Need to be able to take in an enormous corpus that's broken into lines and create the probability matrices.
-    ## To do this, we'll need to have some way of telling it what to do with multiple lines (i.e., don't treat the
-    ## first word of the next line as following the last word of the previous line. 
     def __init__(self, corpus, n_order=1):
+        # corpus is a list of lists
         self.n_order = n_order
 
-        # Dictionary for numbers -> words (we want to manipulate a list of integers for convenience)
-        self.numbertoword = {i: label for i, label in enumerate(set(corpus),0)}
+        # Dictionary for numbers -> words (we want to manipulate a list of integers for calculation speed)
+        self.numbertoword = {i: label for i, label in enumerate(set([item for sublist in corpus for item in sublist]),0)}
         
         # Dictionary for words -> numbers (we need this to create the numerified corpus
         self.wordtonumber = {v: k for k, v in self.numbertoword.items()}
 
         # This is integer-only version of the corpus we passed in. May make things faster???
-        self.numerifiedcorpus = [self.wordtonumber[word] for word in corpus]
+        self.numerifiedcorpus = [[self.wordtonumber[word] for word in line] for line in corpus]
 
         n_states = len(self.numbertoword) 
 
@@ -51,15 +48,17 @@ class MarkovChain:
             raise ValueError('This word isn''t in the corpus')
 
     def fit(self):
-        states = self.numerifiedcorpus
+        
         for i in range(0, self.n_order):
             thisprob = self.matrix_list[i]
             thisorder = thisprob.order
             # Calculate Frequencies
-            for j in xrange(thisorder,len(states)):
-                xloc = thisprob.x.index(tuple(states[j-thisorder:j]))
-                yloc = states[j]
-                thisprob.p[xloc][yloc] += 1
+            for j in xrange(0,len(self.numerifiedcorpus)):
+                thislist = self.numerifiedcorpus[j]
+                for k in xrange(thisorder,len(thislist)):
+                    xloc = thisprob.x.index(tuple(thislist[k-thisorder:k]))
+                    yloc = thislist[k]
+                    thisprob.p[xloc][yloc] += 1
             # Normalize
             for j in xrange(0, thisprob.p.shape[0]):
                 row = thisprob.p[j]
