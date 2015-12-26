@@ -32,6 +32,11 @@ class MarkovChain:
 
         self.matrix_list = []
         for i in range(self.n_order, 0, -1):
+            # NOTE: this creates all possible n-word combinations that *could*
+            # appear in the corpus. Really, we should limit this to n-word
+            # combinations that actually appear in the corpus to limit the
+            # size of these matrices
+            ## TODO: Fix this
             x = list(it.product(range(n_states), repeat=i))
             y = range(n_states)
             p = ProbMatrix(x, y, i)
@@ -41,9 +46,17 @@ class MarkovChain:
         if word in self.word_to_number:
             return self.word_to_number[word]
         else:
-            raise ValueError('This word isn''t in the corpus')
+            print word
+            raise ValueError('This word ("'+word+'") isn\'t in the corpus')
 
     def fit(self):
+        """
+        This is definitely the most computationally intensive piece of this
+        application.
+            TODO:
+                * Parallelize?
+                * Split out frequency calculation from normalization?
+        """
         for i in range(0, self.n_order):
             this_prob = self.matrix_list[i]
             this_order = this_prob.order
