@@ -2,6 +2,17 @@ import numpy as np
 import itertools as it
 import random
 
+def create_sequence_set(lines, order):
+    """
+    Returns a set of tuples that reflect the distinct ngrams
+    (where n is the order) obsvered in the lines (list of lists).
+    """
+    answer = set()
+    for line in lines:
+        for i in xrange(order,len(line)+1):
+            answer.add(tuple(line[i-order:i]))
+    return answer
+
 class ProbMatrix:
     """
         This class holds the probability matrix data crucial to building these models. They take the following form

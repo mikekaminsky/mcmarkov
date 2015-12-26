@@ -5,6 +5,33 @@ import unittest
 
 from markov import MarkovChain
 from markov import ProbMatrix
+from markov import create_sequence_set
+
+class TestSequenceList(unittest.TestCase):
+
+    def setUp(self):
+        self.corpus = [
+                ['alpha','beta','gamma','delta','alpha','gamma','epsilon'],
+                ['alef','bet','gimel','dalet','alef','gimel']
+                ]
+
+        self.short_corpus = [
+                ['alpha','beta','gamma'],
+                ['alef','bet','gimel']
+                ]
+
+    def test_sequence_length_one_returns_distinct_words(self):
+        sequences = create_sequence_set(self.corpus, 1)
+        self.assertEqual(set(sequences), set([(x,) for y in self.corpus for x in y]))
+        self.assertEqual(len(sequences), len(set([(x,) for y in self.corpus for x in y])))
+
+    def test_sequence_length_two_returns_distinct_observed_ngrams(self):
+        sequences = create_sequence_set(self.short_corpus, 2)
+        self.assertEqual(sequences, set([
+            ('alpha', 'beta'),
+            ('beta', 'gamma'),
+            ('alef','bet'),
+            ('bet','gimel')]))
 
 class TestProbMatrix(unittest.TestCase):
 
