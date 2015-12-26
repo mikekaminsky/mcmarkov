@@ -18,46 +18,46 @@ class TestMarkov(unittest.TestCase):
         # If no word is passed, markov should return something
         # TODO: Test this is actually random?
         mc = MarkovChain(self.corpus, 1)
-        mymatlist = mc.fit()
-        self.assertNotEqual(mc.nextWord([]),None)
+        mc.fit()
+        self.assertNotEqual(mc.next_word([]),None)
 
     def test_no_match(self):
         #TODO: Make it so the markov chain always generates something?
         mc = MarkovChain(self.corpus, 1)
-        mymatlist = mc.fit()
-        self.assertRaises(ValueError, mc.nextWord, ['d'])
+        mc.fit()
+        self.assertRaises(ValueError, mc.next_word, ['d'])
 
     def test_single_word(self):
         mc = MarkovChain(self.corpus, 1)
-        mymatlist = mc.fit()
+        mc.fit()
 
         # First line
-        self.assertEqual(mc.nextWord(['a']),'b')
-        self.assertEqual(mc.nextWord(['b']),'c')
-        self.assertEqual(mc.nextWord(['c']),'a')
+        self.assertEqual(mc.next_word(['a']),'b')
+        self.assertEqual(mc.next_word(['b']),'c')
+        self.assertEqual(mc.next_word(['c']),'a')
 
         # Second line
-        self.assertEqual(mc.nextWord(['alef']),'bet')
-        self.assertEqual(mc.nextWord(['bet']),'gimel')
-        self.assertEqual(mc.nextWord(['gimel']),'alef')
+        self.assertEqual(mc.next_word(['alef']),'bet')
+        self.assertEqual(mc.next_word(['bet']),'gimel')
+        self.assertEqual(mc.next_word(['gimel']),'alef')
 
 
     def test_double_word_found(self):
-        # It should look for a match to both a & b first, 
+        # It should look for a match to both a & b first,
         mc = MarkovChain(self.corpus, 2)
-        mymatlist = mc.fit()
-        self.assertEqual(mc.nextWord(['a','b']),'c')
-        self.assertEqual(mc.nextWord(['b','c']),'a')
-        self.assertEqual(mc.nextWord(['alef','bet']),'gimel')
-        self.assertEqual(mc.nextWord(['bet','gimel']),'alef')
+        mc.fit()
+        self.assertEqual(mc.next_word(['a','b']),'c')
+        self.assertEqual(mc.next_word(['b','c']),'a')
+        self.assertEqual(mc.next_word(['alef','bet']),'gimel')
+        self.assertEqual(mc.next_word(['bet','gimel']),'alef')
 
     def test_double_word_not_found(self):
-        # It should look for a match to both a & c first, 
+        # It should look for a match to both a & c first,
         # and when it doesn't find anything, should return the match for c
         mc = MarkovChain(self.corpus, 2)
-        mymatlist = mc.fit()
-        self.assertEqual(mc.nextWord(['a','c']),'a')
-        self.assertEqual(mc.nextWord(['alef','gimel']),'alef')
+        mc.fit()
+        self.assertEqual(mc.next_word(['a','c']),'a')
+        self.assertEqual(mc.next_word(['alef','gimel']),'alef')
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,86 +17,81 @@ class ProbMatrix:
         self.y = y
         self.order = order
         self.p = np.zeros((len(x), len(y)))
-        
+
 class MarkovChain:
     def __init__(self, corpus, n_order=1):
         # corpus is a list of lists
         self.n_order = n_order
-
         # Dictionary for numbers -> words (we want to manipulate a list of integers for calculation speed)
-        self.numbertoword = {i: label for i, label in enumerate(set([item for sublist in corpus for item in sublist]),0)}
-        
+        self.number_to_word = {i: label for i, label in enumerate(set([item for sublist in corpus for item in sublist]),0)}
         # Dictionary for words -> numbers (we need this to create the numerified corpus
-        self.wordtonumber = {v: k for k, v in self.numbertoword.items()}
-
+        self.word_to_number = {v: k for k, v in self.number_to_word.items()}
         # This is integer-only version of the corpus we passed in. May make things faster???
-        self.numerifiedcorpus = [[self.wordtonumber[word] for word in line] for line in corpus]
+        self.numerified_corpus = [[self.word_to_number[word] for word in line] for line in corpus]
+        n_states = len(self.number_to_word)
 
-        n_states = len(self.numbertoword) 
-
-        self.matrix_list = [] 
+        self.matrix_list = []
         for i in range(self.n_order, 0, -1):
             x = list(it.product(range(n_states), repeat=i))
             y = range(n_states)
             p = ProbMatrix(x, y, i)
             self.matrix_list.append(p)
 
-    def convertwordtonumber(self, word):
-        if word in self.wordtonumber:
-            return self.wordtonumber[word]
+    def convert_word_to_number(self, word):
+        if word in self.word_to_number:
+            return self.word_to_number[word]
         else:
             raise ValueError('This word isn''t in the corpus')
 
     def fit(self):
-        
         for i in range(0, self.n_order):
-            thisprob = self.matrix_list[i]
-            thisorder = thisprob.order
+            this_prob = self.matrix_list[i]
+            this_order = this_prob.order
             # Calculate Frequencies
-            for j in xrange(0,len(self.numerifiedcorpus)):
-                thislist = self.numerifiedcorpus[j]
-                for k in xrange(thisorder,len(thislist)):
-                    xloc = thisprob.x.index(tuple(thislist[k-thisorder:k]))
-                    yloc = thislist[k]
-                    thisprob.p[xloc][yloc] += 1
+            for j in xrange(0,len(self.numerified_corpus)):
+                this_list = self.numerified_corpus[j]
+                for k in xrange(this_order,len(this_list)):
+                    xloc = this_prob.x.index(tuple(this_list[k-this_order:k]))
+                    yloc = this_list[k]
+                    this_prob.p[xloc][yloc] += 1
             # Normalize
-            for j in xrange(0, thisprob.p.shape[0]):
-                row = thisprob.p[j]
+            for j in xrange(0, this_prob.p.shape[0]):
+                row = this_prob.p[j]
                 t = row.sum()
                 if t <> 0:
-                    thisprob.p[j] = row/t
+                    this_prob.p[j] = row/t
         return self.matrix_list
 
-    def nextWord(self, precendingtext=[]):
+    def next_word(self, preceding_text=[]):
         # TODO:
-        # Create a separate data structure that stores the *first word* in a line from the corpus, then 
+        # Create a separate data structure that stores the *first word* in a line from the corpus, then
         # Chooses among *those*
-        if not precendingtext:
-            precendingtext = [random.choice(self.wordtonumber.keys())]
-        precedingnumbers = [self.convertwordtonumber(word) for word in precendingtext]
+        if not preceding_text:
+            preceding_text = [random.choice(self.word_to_number.keys())]
+        preceding_numbers = [self.convert_word_to_number(word) for word in preceding_text]
 
         for i in range(0, self.n_order):
-            if self.matrix_list[i].order > len(precedingnumbers):
+            if self.matrix_list[i].order > len(preceding_numbers):
                 continue
-            if self.matrix_list[i].order < len(precedingnumbers):
-                precedingnumbers = precedingnumbers[-self.matrix_list[i].order:]
-            thisprob = self.matrix_list[i]
-            thisorder = thisprob.order
-            if tuple(precedingnumbers) in thisprob.x:
-                probs = thisprob.p[thisprob.x.index(tuple(precedingnumbers)),:]
+            if self.matrix_list[i].order < len(preceding_numbers):
+                preceding_numbers = preceding_numbers[-self.matrix_list[i].order:]
+            this_prob = self.matrix_list[i]
+            this_order = this_prob.order
+            if tuple(preceding_numbers) in this_prob.x:
+                probs = this_prob.p[this_prob.x.index(tuple(preceding_numbers)),:]
             else:
                 continue
             sample = random.random()
-            maxprob = 0.0
-            maxprobword = None
+            max_prob = 0.0
+            max_prob_word = None
             for j in range(0, len(probs)):
-                if probs[j] > maxprob:
-                    maxprob = probs[j]
-                    maxprobword = j
+                if probs[j] > max_prob:
+                    max_prob = probs[j]
+                    max_prob_word = j
                 if sample > probs[j]:
                     sample -= probs[j]
                 else:
-                    return self.numbertoword[j]
-            if maxprobword:
-                return self.numbertoword[maxprobword]
+                    return self.number_to_word[j]
+            if max_prob_word:
+                return self.number_to_word[max_prob_word]
         return None

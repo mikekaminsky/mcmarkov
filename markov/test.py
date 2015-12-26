@@ -29,14 +29,14 @@ class TestMarkovChain(unittest.TestCase):
 
     def test_inverse_dictionaries(self):
         """
-        Check if the numbertoword and wordtonumber dictionaries are
+        Check if the number_to_word and word_to_number dictionaries are
         inverses of each other
         """
         mc = MarkovChain(self.corpus, 1)
-        inv_number_to_word = {v: k for k, v in mc.numbertoword.items()}
-        inv_word_to_number = {v: k for k, v in mc.wordtonumber.items()}
-        self.assertEqual(inv_number_to_word, mc.wordtonumber)
-        self.assertEqual(inv_word_to_number, mc.numbertoword)
+        inv_number_to_word = {v: k for k, v in mc.number_to_word.items()}
+        inv_word_to_number = {v: k for k, v in mc.word_to_number.items()}
+        self.assertEqual(inv_number_to_word, mc.word_to_number)
+        self.assertEqual(inv_word_to_number, mc.number_to_word)
 
     def test_numerified_corpus(self):
         """
@@ -44,35 +44,35 @@ class TestMarkovChain(unittest.TestCase):
         number of unique values as the original corpus
         """
         mc = MarkovChain(self.corpus, 1)
-        self.assertEqual(len(mc.numerifiedcorpus),len(self.corpus))
-        self.assertEqual(len(set([item for sublist in mc.numerifiedcorpus for item in sublist])),len(set(self.flattened_corpus)))
+        self.assertEqual(len(mc.numerified_corpus),len(self.corpus))
+        self.assertEqual(len(set([item for sublist in mc.numerified_corpus for item in sublist])),len(set(self.flattened_corpus)))
 
     def test_fits_sum_to_one(self):
         mc = MarkovChain(self.corpus, 1)
         mc.fit()
         p = mc.matrix_list[0].p
-        self.assertEqual(sum(p[mc.convertwordtonumber('alpha')]),1)
-        self.assertEqual(sum(p[mc.convertwordtonumber('beta')]),1)
-        self.assertEqual(sum(p[mc.convertwordtonumber('gamma')]),1)
-        self.assertEqual(sum(p[mc.convertwordtonumber('delta')]),1)
+        self.assertEqual(sum(p[mc.convert_word_to_number('alpha')]),1)
+        self.assertEqual(sum(p[mc.convert_word_to_number('beta')]),1)
+        self.assertEqual(sum(p[mc.convert_word_to_number('gamma')]),1)
+        self.assertEqual(sum(p[mc.convert_word_to_number('delta')]),1)
 
     def test_finds_highest_order_solution_first(self):
         mc = MarkovChain(self.corpus, 3)
         mc.fit()
-        nextw = mc.nextWord(['alpha','beta','gamma'])
+        nextw = mc.next_word(['alpha','beta','gamma'])
         self.assertEqual(nextw, 'delta')
 
     def test_second_best_solution_next(self):
         mc = MarkovChain(self.corpus, 3)
         mc.fit()
         # TODO: Make sure it tests for beta delta together first?
-        nextw = mc.nextWord(['beta','delta'])
+        nextw = mc.next_word(['beta','delta'])
         self.assertEqual(nextw, 'alpha')
 
     def test_probs_stop_across_lines(self):
         mc = MarkovChain(self.corpus, 3)
         mc.fit()
-        nextw = mc.nextWord(['alpha','epsilon'])
+        nextw = mc.next_word(['alpha','epsilon'])
         self.assertEqual(nextw, None) # Nothing follows epsilon
 
 if __name__ == '__main__':
