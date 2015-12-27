@@ -6,7 +6,6 @@ import random
 ## Check that arguments are correct (e.g., list of lists instead of lists) to prevent
 ## stupid programming errors
 
-
 def create_sequence_list(lines, order):
     """
     Returns a list of tuples that reflect the distinct ngrams
@@ -97,7 +96,7 @@ class MarkovChain:
         # TODO:
         # Create a separate data structure that stores the *first word*
         # in a line from the corpus, then chooses among *those*
-        if not preceding_text:
+        if (not preceding_text) or (preceding_text == ['\n']):
             preceding_text = [random.choice(self.word_to_number.keys())]
         preceding_numbers = [self.convert_word_to_number(word) for word in preceding_text]
 
@@ -126,4 +125,4 @@ class MarkovChain:
                     return self.number_to_word[j]
             if max_prob_word:
                 return self.number_to_word[max_prob_word]
-        return None
+        return '\n' # We get to here when we get to a word where we never observe any following words (e.g., if the last word in the line only appears last)

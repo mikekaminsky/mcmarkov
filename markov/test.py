@@ -106,7 +106,7 @@ class TestMarkovChain(unittest.TestCase):
         mc = MarkovChain(self.corpus, 3)
         mc.fit()
         nextw = mc.next_word(['alpha','epsilon'])
-        self.assertEqual(nextw, None) # Nothing follows epsilon
+        self.assertEqual(nextw, '\n') # Nothing follows epsilon
 
 if __name__ == '__main__':
     unittest.main()
