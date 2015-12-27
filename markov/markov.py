@@ -96,8 +96,11 @@ class MarkovChain:
         # TODO:
         # Create a separate data structure that stores the *first word*
         # in a line from the corpus, then chooses among *those*
-        if (not preceding_text) or (preceding_text == ['\n']):
-            preceding_text = [random.choice(self.word_to_number.keys())]
+        if not preceding_text: # Starts a new generation
+            return random.choice(self.word_to_number.keys())
+        if preceding_text == ['\n']: # Starts a new line
+            return random.choice(self.word_to_number.keys())
+
         preceding_numbers = [self.convert_word_to_number(word) for word in preceding_text]
 
         for i in range(0, self.n_order):
