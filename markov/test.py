@@ -5,7 +5,7 @@ import unittest
 
 from markov import MarkovChain
 from markov import ProbMatrix
-from markov import create_sequence_set
+from markov import create_sequence_list
 
 class TestSequenceList(unittest.TestCase):
 
@@ -21,13 +21,13 @@ class TestSequenceList(unittest.TestCase):
                 ]
 
     def test_sequence_length_one_returns_distinct_words(self):
-        sequences = create_sequence_set(self.corpus, 1)
+        sequences = create_sequence_list(self.corpus, 1)
         self.assertEqual(set(sequences), set([(x,) for y in self.corpus for x in y]))
         self.assertEqual(len(sequences), len(set([(x,) for y in self.corpus for x in y])))
 
     def test_sequence_length_two_returns_distinct_observed_ngrams(self):
-        sequences = create_sequence_set(self.short_corpus, 2)
-        self.assertEqual(sequences, set([
+        sequences = create_sequence_list(self.short_corpus, 2)
+        self.assertEqual(set(sequences), set([
             ('alpha', 'beta'),
             ('beta', 'gamma'),
             ('alef','bet'),
@@ -47,7 +47,6 @@ class TestProbMatrix(unittest.TestCase):
 class TestMarkovChain(unittest.TestCase):
 
     def setUp(self):
-
         self.corpus = [
                 ['alpha','beta','gamma','delta','alpha','gamma','epsilon'],
                 ['alef','bet','gimel','dalet','alef','gimel']
@@ -95,6 +94,13 @@ class TestMarkovChain(unittest.TestCase):
         # TODO: Make sure it tests for beta delta together first?
         nextw = mc.next_word(['beta','delta'])
         self.assertEqual(nextw, 'alpha')
+
+    def test_only_observed_ngrams_in_higher_order_matrices(self):
+        small_corpus = [['alpha','beta','gamma','delta']]
+        mc = MarkovChain(small_corpus, 2)
+        # x values should be
+        ## [('alpha', 'beta'), ('beta', 'gamma'), ('gamma', 'delta')]
+        self.assertEqual(mc.matrix_list[0].p.shape, (3,4))
 
     def test_probs_stop_across_lines(self):
         mc = MarkovChain(self.corpus, 3)

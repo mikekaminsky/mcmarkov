@@ -2,21 +2,29 @@ import numpy as np
 import itertools as it
 import random
 
-def create_sequence_set(lines, order):
+# TODO:
+## Check that arguments are correct (e.g., list of lists instead of lists) to prevent
+## stupid programming errors
+
+
+def create_sequence_list(lines, order):
     """
-    Returns a set of tuples that reflect the distinct ngrams
+    Returns a list of tuples that reflect the distinct ngrams
     (where n is the order) obsvered in the lines (list of lists).
     """
     answer = set()
     for line in lines:
         for i in xrange(order,len(line)+1):
             answer.add(tuple(line[i-order:i]))
-    return answer
+    return list(answer)
 
 class ProbMatrix:
     """
-        This class holds the probability matrix data crucial to building these models. They take the following form
-        where (x_i, y_j) contains the likelihood of word y_i following the words contained in the tuple x_j
+        This class holds the probability matrix data crucial to building
+        these models. They take the following form where (x_i, y_j) contains
+        the likelihood of word y_i following the words contained in the
+        tuple x_j
+
             y_0 y_1 ... y_n
         x_0
         x_1
@@ -39,18 +47,16 @@ class MarkovChain:
         self.word_to_number = {v: k for k, v in self.number_to_word.items()}
         # This is integer-only version of the corpus we passed in. May make things faster???
         self.numerified_corpus = [[self.word_to_number[word] for word in line] for line in corpus]
-        n_states = len(self.number_to_word)
-
         self.matrix_list = []
+        self.observed_sequence_lists = []
+
         for i in range(self.n_order, 0, -1):
-            # NOTE: this creates all possible n-word combinations that *could*
-            # appear in the corpus. Really, we should limit this to n-word
-            # combinations that actually appear in the corpus to limit the
-            # size of these matrices
-            ## TODO: Fix this
-            x = list(it.product(range(n_states), repeat=i))
-            y = range(n_states)
+            this_sequence_list = create_sequence_list(self.numerified_corpus,i)
+            x = range(len(this_sequence_list))
+            y = range(len(self.number_to_word))
             p = ProbMatrix(x, y, i)
+
+            self.observed_sequence_lists.append(this_sequence_list)
             self.matrix_list.append(p)
 
     def convert_word_to_number(self, word):
@@ -71,11 +77,12 @@ class MarkovChain:
         for i in range(0, self.n_order):
             this_prob = self.matrix_list[i]
             this_order = this_prob.order
+            this_sequence_list = self.observed_sequence_lists[i]
             # Calculate Frequencies
             for j in xrange(0,len(self.numerified_corpus)):
                 this_list = self.numerified_corpus[j]
                 for k in xrange(this_order,len(this_list)):
-                    xloc = this_prob.x.index(tuple(this_list[k-this_order:k]))
+                    xloc = this_sequence_list.index(tuple(this_list[k-this_order:k]))
                     yloc = this_list[k]
                     this_prob.p[xloc][yloc] += 1
             # Normalize
@@ -88,21 +95,22 @@ class MarkovChain:
 
     def next_word(self, preceding_text=[]):
         # TODO:
-        # Create a separate data structure that stores the *first word* in a line from the corpus, then
-        # Chooses among *those*
+        # Create a separate data structure that stores the *first word*
+        # in a line from the corpus, then chooses among *those*
         if not preceding_text:
             preceding_text = [random.choice(self.word_to_number.keys())]
         preceding_numbers = [self.convert_word_to_number(word) for word in preceding_text]
 
         for i in range(0, self.n_order):
+            this_sequence_list = self.observed_sequence_lists[i]
             if self.matrix_list[i].order > len(preceding_numbers):
                 continue
             if self.matrix_list[i].order < len(preceding_numbers):
                 preceding_numbers = preceding_numbers[-self.matrix_list[i].order:]
             this_prob = self.matrix_list[i]
             this_order = this_prob.order
-            if tuple(preceding_numbers) in this_prob.x:
-                probs = this_prob.p[this_prob.x.index(tuple(preceding_numbers)),:]
+            if tuple(preceding_numbers) in this_sequence_list:
+                probs = this_prob.p[this_sequence_list.index(tuple(preceding_numbers)),:]
             else:
                 continue
             sample = random.random()
