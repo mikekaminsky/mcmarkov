@@ -4,7 +4,7 @@
 
 from curses.ascii import isdigit
 from nltk.corpus import cmudict
-d = cmudict.dict()
+cmu_dictionary = cmudict.dict()
 
 def approx_nsyl(word):
     digraphs = {"ai", "au", "ay", "ea", "ee", "ei", "ey", "oa", "oe", "oi", "oo", "ou", "oy", "ua", "ue", "ui"}
@@ -26,13 +26,13 @@ def approx_nsyl(word):
 
 def nsyl(word):
     # return the min syllable count in the case of multiple pronunciations
-    if not word.lower() in d:
+    if not word.lower() in cmu_dictionary:
         return approx_nsyl(word)
-    return min([len([y for y in x if isdigit(str(y[-1]))]) for x in d[word.lower()]])
+    return min([len([y for y in x if isdigit(str(y[-1]))]) for x in cmu_dictionary[word.lower()]])
 
 def rhymesyls(word):
-    if word.lower() in d:
-        list1 = min(d[word.lower()], key=len)
+    if word.lower() in cmu_dictionary:
+        list1 = min(cmu_dictionary[word.lower()], key=len)
         outlist = str()
         i = -1
         while i >= 0 - len(list1):
