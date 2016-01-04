@@ -23,5 +23,10 @@ class TestMC(unittest.TestCase):
         self.assertEqual(MC.corpus[0],list(reversed(self.corpus[0])))
         self.assertEqual(MC.corpus[1],list(reversed(self.corpus[1])))
 
+    def test_starting_words(self):
+        MC = MCMarkov(self.corpus, 1, True)
+        self.assertEqual(MC.starting_words,['epsilon','gimel'])
+
+
 if __name__ == '__main__':
     unittest.main()

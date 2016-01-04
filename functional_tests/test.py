@@ -27,6 +27,10 @@ class TestMC(unittest.TestCase):
         self.assertEqual(mc.next_word(['gimel']),'bet')
         self.assertEqual(mc.next_word(['alef']),'gimel')
 
+    def test_seed_words(self):
+        MC = MCMarkov(self.corpus, 1, False)
+        self.assertEqual(MC.starting_words,['a', 'alef'])
+
 class TestMarkov(unittest.TestCase):
 
     def setUp(self):

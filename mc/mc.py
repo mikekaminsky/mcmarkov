@@ -13,3 +13,12 @@ class MCMarkov():
             self.corpus = corpus
         self.markovchain = MarkovChain(self.corpus, n_order)
         self.markovchain.fit()
+        self.starting_words = [line[0] for line in self.corpus]
+
+
+
+
+        # TODO:
+        # Create a separate data structure that stores the *first word*
+        # in a line from the corpus, then chooses among *those*
+

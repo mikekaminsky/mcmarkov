@@ -93,9 +93,6 @@ class MarkovChain:
         return self.matrix_list
 
     def next_word(self, preceding_text=[]):
-        # TODO:
-        # Create a separate data structure that stores the *first word*
-        # in a line from the corpus, then chooses among *those*
         if not preceding_text: # Starts a new generation
             return random.choice(self.word_to_number.keys())
         if preceding_text == ['\n']: # Starts a new line
