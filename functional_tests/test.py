@@ -4,7 +4,28 @@ sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 import unittest
 
 from markov.markov import MarkovChain
+from mc.mc import MCMarkov
 
+class TestMC(unittest.TestCase):
+
+    def setUp(self):
+        self.corpus = [
+                ['a','b','c','a','b','c'],
+                ['alef','bet','gimel','alef','bet','gimel']
+                    ]
+
+    def test_reverse_lines(self):
+        MC = MCMarkov(self.corpus, 1, True)
+        mc = MC.markovchain
+        # First line
+        self.assertEqual(mc.next_word(['b']),'a')
+        self.assertEqual(mc.next_word(['c']),'b')
+        self.assertEqual(mc.next_word(['a']),'c')
+
+        # Second line
+        self.assertEqual(mc.next_word(['bet']),'alef')
+        self.assertEqual(mc.next_word(['gimel']),'bet')
+        self.assertEqual(mc.next_word(['alef']),'gimel')
 
 class TestMarkov(unittest.TestCase):
 
