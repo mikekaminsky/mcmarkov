@@ -18,6 +18,15 @@ The markov chain trainer makes a number of improvements over other out-of-the-bo
 
 ###New Features
 5. Write song-writing module that includes the following components
-   * Ability to specify the ending word of a line (for rhyming)
-   * Ability to specify the syllable count of a line
-2. Create a separate data structure that stores the *first word* of lines entered in the corpus so that these can be used for new song generation/new line start
+   [x] Ability to specify the ending word of a line (for rhyming)
+   [ ] Ability to end the next line with a word that rhymes with the last word of the previosu line
+      [ ] Create dictionary of rhymes for last-words that are used as 'seeds'
+          * How to handle frequency? Should the list be unique, or should it reflect observed frequency?
+      [ ] Write a method for choosing a rhyming word that rhymed with the last line but is not the same word
+      [ ] Write a method for building raps using couplets
+   [ ] Option to 'clean' the corpus by removing certain punctuation
+   [ ] Ability to specify the syllable count of a line
+
+
+## Testing:
+From the installed directory, run `python -m unittest discover -s . -p 'test.py'`

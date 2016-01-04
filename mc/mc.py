@@ -4,6 +4,16 @@ sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
 from markov.markov import MarkovChain
 
+
+# TODO:
+#  [ ] Ability to end the next line with a word that rhymes with the last word of the previosu line
+#     [ ] Create dictionary of rhymes for last-words that are used as 'seeds'
+#         * How to handle frequency? Should the list be unique, or should it reflect observed frequency?
+#     [ ] Write a method for choosing a rhyming word that rhymed with the last line but is not the same word
+#     [ ] Write a method for building raps using couplets
+#  [ ] Ability to specify the syllable count of a line
+#  [ ] Option to 'clean' the corpus by removing certain punctuation
+
 class MCMarkov():
 
     def __init__(self, corpus, n_order=1, reverse=True):
@@ -14,11 +24,3 @@ class MCMarkov():
         self.markovchain = MarkovChain(self.corpus, n_order)
         self.markovchain.fit()
         self.starting_words = [line[0] for line in self.corpus]
-
-
-
-
-        # TODO:
-        # Create a separate data structure that stores the *first word*
-        # in a line from the corpus, then chooses among *those*
-
