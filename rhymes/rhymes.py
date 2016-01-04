@@ -5,10 +5,9 @@
 import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-
+import re
 import nltk
 nltk.data.path = [path.dirname( path.dirname( path.abspath(__file__) ) )]
-
 from curses.ascii import isdigit
 from nltk.corpus import cmudict
 cmu_dictionary = cmudict.dict()
