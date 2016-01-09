@@ -6,6 +6,7 @@ import unittest
 from rhymes import approx_nsyl
 from rhymes import nsyl
 from rhymes import rhymesyls
+from rhymes import rhymes_with
 
 
 class test_nsyl(unittest.TestCase):
@@ -20,8 +21,13 @@ class test_nsyl(unittest.TestCase):
         self.assertEqual(rhymesyls("pie"),rhymesyls("sty"))
         self.assertNotEqual(rhymesyls("pie"),rhymesyls("bed"))
         self.assertEqual(rhymesyls("fated"),rhymesyls("mated"))
-        # TODO: get this test to pass:
-        # self.assertEqual(rhymesyls("hated"),rhymesyls("mated"))
+
+    def test_rhymes_with(self):
+        self.assertTrue(rhymes_with("pie", "sty"))
+        self.assertFalse(rhymes_with("pie", "bed"))
+        self.assertTrue(rhymes_with("fated", "mated"))
+        self.assertTrue(rhymes_with("hated", "mated"))
+        self.assertFalse(rhymes_with("hated", "cater"))
 
 if __name__ == '__main__':
     unittest.main()

@@ -38,17 +38,29 @@ def nsyl(word):
 
 def rhymesyls(word):
     if word.lower() in cmu_dictionary:
-        list1 = min(cmu_dictionary[word.lower()], key=len)
-        outlist = str()
-        i = -1
-        while i >= 0 - len(list1):
-            if isdigit(str(list1[i][-1])):
-                outlist = list1[i][:-1]
-                if i != -1:
-                    outlist = outlist + ' ' + list1[i + 1:][0]
-                return outlist
-            i -= 1
-        return outlist
+        pronunciations = cmu_dictionary[word.lower()]
+        rhyming_syllables_list = []
+        for pronunciation in pronunciations:
+            rhyming_syllables_list.append(rhymesyls_for_pronunciation(pronunciation))
+        return list(set(rhyming_syllables_list))
     else:
         return "NORHYME"
+
+def rhymes_with(word1, word2):
+    # return true if any of the pronunciations for word1 rhyme with word2
+    word1_rhymesyls = rhymesyls(word1)
+    word2_rhymesyls = rhymesyls(word2)
+    return bool(set(word1_rhymesyls) & set(word2_rhymesyls))
+
+def rhymesyls_for_pronunciation(pronunciation):
+    outlist = str()
+    i = -1
+    while i >= 0 - len(pronunciation):
+        if isdigit(str(pronunciation[i][-1])):
+            outlist = pronunciation[i][:-1]
+            if i != -1:
+                outlist = outlist + ' ' + pronunciation[i + 1:][0]
+            return outlist
+        i -= 1
+    return outlist
 
