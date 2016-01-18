@@ -48,11 +48,10 @@ class TestMC(unittest.TestCase):
     def test_couplets_rhyme(self):
         MC = MCMarkov(self.corpus, 1, False)
         new_song = MC.create_song(couplets=5, syllables=10)
-
-        for i in range(0,5):
-            word1 = new_song[i*2][-1]
-            word2 = new_song[i*2+1][-1]
-            self.assertTrue(rhymes_with(word1, word2))
+        for couplet in new_song:
+            endword1 = couplet[0][-1]
+            endword2 = couplet[1][-1]
+            self.assertTrue(rhymes_with(endword1, endword2))
 
 
 class TestMarkov(unittest.TestCase):
