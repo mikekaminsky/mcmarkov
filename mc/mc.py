@@ -39,7 +39,7 @@ class MCMarkov():
                     self.rhymedict[key] = [word]
         self.words_to_rhyme = {}
         for key in self.rhymedict.keys():
-            if len(self.rhymedict[key])>1:
+            if len(set(self.rhymedict[key]))>1:
                 self.words_to_rhyme[key] = self.rhymedict[key]
 
 
