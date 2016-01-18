@@ -5,15 +5,10 @@ import random
 
 from markov.markov import MarkovChain
 from rhymes.rhymes import rhymesyls
+from rhymes.rhymes import nsyl
 
 
 # TODO:
-#  [ ] Ability to end the next line with a word that rhymes with the last word of the previosu line
-#     [ ] Create dictionary of rhymes for last-words that are used as 'seeds'
-#         * How to handle frequency? Should the list be unique, or should it reflect observed frequency?
-#     [ ] Write a method for choosing a rhyming word that rhymed with the last line but is not the same word
-#     [ ] Write a method for building raps using couplets
-#  [ ] Ability to specify the syllable count of a line
 #  [ ] Option to 'clean' the corpus by removing certain punctuation
 
 
@@ -43,27 +38,41 @@ class MCMarkov():
                 self.words_to_rhyme[key] = self.rhymedict[key]
 
 
-    def create_line(self, startingword, wordcount): # To be changed to syllable count
+    def create_line(self, startingword, syllable_count): # To be changed to syllable count
         line = [startingword]
-        for i in range(0, wordcount):
+        remaining_syllable_count = syllable_count - nsyl(startingword)
+        i = 0
+        while remaining_syllable_count > 0:
             if i == 0:
                 word = self.markovchain.next_word([startingword])
             else:
                 word = self.markovchain.next_word([word])
-            line.append(word)
+            if nsyl(word) <= remaining_syllable_count:
+                line.append(word)
+                remaining_syllable_count -= nsyl(word)
+                i += 1
         if self.reverse:
             line = line[::-1]
         return line
 
-    def create_song(self, couplets, syllables):
+    def create_song(self, couplet_count, syllable_count, syllable_map = None):
+        if syllable_map is not None:
+            couplet_count = len(syllable_map)
         song = []
-        for i in range(0,couplets):
+        for i in range(0,couplet_count):
+            if syllable_map is not None:
+                line_map = syllable_map[i]
+                line1_syllable_count = line_map[0]
+                line2_syllable_count = line_map[1]
+            else:
+                line1_syllable_count = syllable_count
+                line2_syllable_count = syllable_count
             rhymewords = set(self.words_to_rhyme[random.choice(self.words_to_rhyme.keys())])
             thisrhymes = random.sample(rhymewords,2)
             startingword1 = thisrhymes[0]
             startingword2 = thisrhymes[1]
-            line1 = self.create_line(startingword1, 5)
-            line2 = self.create_line(startingword2, 5)
+            line1 = self.create_line(startingword1, line1_syllable_count)
+            line2 = self.create_line(startingword2, line2_syllable_count)
             couplet = [line1, line2]
             song.append(couplet)
         return song

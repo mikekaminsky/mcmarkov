@@ -5,6 +5,7 @@ import unittest
 
 from mc import MCMarkov
 from rhymes.rhymes import rhymes_with
+from rhymes.rhymes import nsyl
 
 class TestMC(unittest.TestCase):
 
@@ -91,6 +92,25 @@ class TestMC(unittest.TestCase):
             endword1 = couplet[0][-1]
             endword2 = couplet[1][-1]
             self.assertNotEqual(endword1, endword2)
+
+    def test_lines_in_couplet_have_syllable_length(self):
+        MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
+        song = MC.create_song(4, 10)
+        for couplet in song:
+            for line in couplet:
+                self.assertEqual(sum(nsyl(word) for word in line),10)
+
+
+    def test_syllable_map(self):
+        MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
+        syllable_map = [[7,10],[5,12]]
+        new_song = MC.create_song(couplet_count=None, syllable_count=None, syllable_map=syllable_map)
+        for i, couplet in enumerate(new_song):
+            couplet_map = syllable_map[i]
+            for j, line in enumerate(couplet):
+                line_map = couplet_map[j]
+                sylcount = sum(nsyl(word) for word in line)
+                self.assertEqual(sylcount, line_map)
 
     def test_corpus_must_have_at_least_two_rhyming_starting_words(self):
         pass
