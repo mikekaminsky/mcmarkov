@@ -31,6 +31,29 @@ class TestMC(unittest.TestCase):
         MC = MCMarkov(self.corpus, 1, False)
         self.assertEqual(MC.starting_words,['a', 'alef'])
 
+    def test_number_of_couplets(self):
+        MC = MCMarkov(self.corpus, 1, False)
+        new_song = MC.create_song(couplets=5, syllables=10)
+        self.assertEqual(len(new_song),10)
+
+    def test_number_of_syllables(self):
+        MC = MCMarkov(self.corpus, 1, False)
+        new_song = MC.create_song(couplets=5, syllables=10)
+        for i in range(0,10):
+            line = new_song[i]
+            sylcount = sum(nsyl(word) for word in line)
+            self.assertEqual(sylcount,10)
+
+    def test_couplets_rhyme(self):
+        MC = MCMarkov(self.corpus, 1, False)
+        new_song = MC.create_song(couplets=5, syllables=10)
+
+        for i in range(0,5):
+            word1 = new_song[i*2][-1]
+            word2 = new_song[i*2+1][-1]
+            self.assertTrue(rhymes_with(word1, word2))
+
+
 class TestMarkov(unittest.TestCase):
 
     def setUp(self):
