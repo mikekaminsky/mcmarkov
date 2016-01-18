@@ -20,13 +20,13 @@ The markov chain trainer makes a number of improvements over other out-of-the-bo
 ###New Features
 5. Write song-writing module that includes the following components
 - [x] Ability to specify the ending word of a line (for rhyming)
-- [ ] Ability to end the next line with a word that rhymes with the last word of the previous line
-   - [ ] Create dictionary of rhymes for last-words that are used as 'seeds'
+- [x] Ability to end the next line with a word that rhymes with the last word of the previous line
+   - [x] Create dictionary of rhymes for last-words that are used as 'seeds'
       * How to handle frequency? Should the list be unique, or should it reflect observed frequency?
-   - [ ] Write a method for choosing a rhyming word that rhymed with the last line but is not the same word
-   - [ ] Write a method for building raps using couplets
+   - [x] Write a method for choosing a rhyming word that rhymed with the last line but is not the same word
+   - [x] Write a method for building raps using couplets
+- [x] Ability to specify the syllable count of a line
 - [ ] Option to 'clean' the corpus by removing certain punctuation
-- [ ] Ability to specify the syllable count of a line
 
 
 ## Testing:

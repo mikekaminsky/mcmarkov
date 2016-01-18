@@ -53,12 +53,12 @@ class TestMC(unittest.TestCase):
 
     def test_number_of_couplets(self):
         MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        new_song = MC.create_song(couplets=5, syllable_count=10)
+        new_song = MC.create_song(couplet_count=5, syllable_count=10)
         self.assertEqual(len(new_song),5)
 
     def test_number_of_syllables(self):
         MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        new_song = MC.create_song(couplets=5, syllable_count=10)
+        new_song = MC.create_song(couplet_count=5, syllable_count=10)
         for couplet in new_song:
             for line in couplet:
                 sylcount = sum(nsyl(word) for word in line)
@@ -66,12 +66,22 @@ class TestMC(unittest.TestCase):
 
     def test_couplets_rhyme(self):
         MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        new_song = MC.create_song(couplets=5, syllable_count=10)
+        new_song = MC.create_song(couplet_count=5, syllable_count=10)
         for couplet in new_song:
             endword1 = couplet[0][-1]
             endword2 = couplet[1][-1]
             self.assertTrue(rhymes_with(endword1, endword2))
 
+    def test_syllable_map(self):
+        MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
+        syllable_map = [[7,10],[5,12]]
+        new_song = MC.create_song(couplet_count=None, syllable_count=None, syllable_map=syllable_map)
+        for i, couplet in enumerate(new_song):
+            couplet_map = syllable_map[i]
+            for j, line in enumerate(couplet):
+                line_map = couplet_map[j]
+                sylcount = sum(nsyl(word) for word in line)
+                self.assertEqual(sylcount, line_map)
 
 class TestMarkov(unittest.TestCase):
 
