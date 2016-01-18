@@ -24,3 +24,9 @@ class MCMarkov():
         self.markovchain = MarkovChain(self.corpus, n_order)
         self.markovchain.fit()
         self.starting_words = [line[0] for line in self.corpus]
+        self.rhymedict = {}
+
+
+
+    def create_song(self, couplets, syllables):
+        pass

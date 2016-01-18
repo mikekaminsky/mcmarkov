@@ -5,6 +5,7 @@ import unittest
 
 from markov.markov import MarkovChain
 from mc.mc import MCMarkov
+from rhymes.rhymes import nsyl, rhymes_with
 
 class TestMC(unittest.TestCase):
 
