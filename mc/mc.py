@@ -25,6 +25,7 @@ class MCMarkov():
             self.corpus = [line[::-1] for line in corpus]
         else:
             self.corpus = corpus
+        self.reverse = reverse
         self.markovchain = MarkovChain(self.corpus, n_order)
         self.markovchain.fit()
         self.starting_words = [line[0] for line in self.corpus]
@@ -42,6 +43,18 @@ class MCMarkov():
                 self.words_to_rhyme[key] = self.rhymedict[key]
 
 
+    def create_line(self, startingword, wordcount): # To be changed to syllable count
+        line = [startingword]
+        for i in range(0, wordcount):
+            if i == 0:
+                word = self.markovchain.next_word([startingword])
+            else:
+                word = self.markovchain.next_word([word])
+            line.append(word)
+        if self.reverse:
+            line = line[::-1]
+        return line
+
     def create_song(self, couplets, syllables):
         song = []
         for i in range(0,couplets):
@@ -49,21 +62,8 @@ class MCMarkov():
             thisrhymes = random.sample(rhymewords,2)
             startingword1 = thisrhymes[0]
             startingword2 = thisrhymes[1]
-            #Line 1
-            line1 = [startingword1]
-            line2 = [startingword2]
-            for j in range(0,5):
-                if j == 0:
-                    word = self.markovchain.next_word([startingword1])
-                else:
-                    word = self.markovchain.next_word([word])
-                line1.append(word)
-            for j in range(0,5):
-                if j == 0:
-                    word = self.markovchain.next_word([startingword2])
-                else:
-                    word = self.markovchain.next_word([word])
-                line2.append(word)
-            couplet = [line1[::-1], line2[::-1]]
+            line1 = self.create_line(startingword1, 5)
+            line2 = self.create_line(startingword2, 5)
+            couplet = [line1, line2]
             song.append(couplet)
         return song
