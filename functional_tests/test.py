@@ -53,20 +53,20 @@ class TestMC(unittest.TestCase):
 
     def test_number_of_couplets(self):
         MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        new_song = MC.create_song(couplets=5, syllables=10)
+        new_song = MC.create_song(couplets=5, syllable_count=10)
         self.assertEqual(len(new_song),5)
 
-    #def test_number_of_syllables(self):
-        #MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        #new_song = MC.create_song(couplets=5, syllables=10)
-        #for couplet in new_song:
-            #for line in couplet:
-                #sylcount = sum(nsyl(word) for word in line)
-                #self.assertEqual(sylcount,10)
+    def test_number_of_syllables(self):
+        MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
+        new_song = MC.create_song(couplets=5, syllable_count=10)
+        for couplet in new_song:
+            for line in couplet:
+                sylcount = sum(nsyl(word) for word in line)
+                self.assertEqual(sylcount,10)
 
     def test_couplets_rhyme(self):
         MC = MCMarkov(self.where_the_sidewalk_ends, 1, True)
-        new_song = MC.create_song(couplets=5, syllables=10)
+        new_song = MC.create_song(couplets=5, syllable_count=10)
         for couplet in new_song:
             endword1 = couplet[0][-1]
             endword2 = couplet[1][-1]

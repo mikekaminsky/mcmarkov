@@ -5,6 +5,7 @@ import random
 
 from markov.markov import MarkovChain
 from rhymes.rhymes import rhymesyls
+from rhymes.rhymes import nsyl
 
 
 # TODO:
@@ -43,27 +44,32 @@ class MCMarkov():
                 self.words_to_rhyme[key] = self.rhymedict[key]
 
 
-    def create_line(self, startingword, wordcount): # To be changed to syllable count
+    def create_line(self, startingword, syllable_count): # To be changed to syllable count
         line = [startingword]
-        for i in range(0, wordcount):
+        remaining_syllable_count = syllable_count - nsyl(startingword)
+        i = 0
+        while remaining_syllable_count > 0:
             if i == 0:
                 word = self.markovchain.next_word([startingword])
             else:
                 word = self.markovchain.next_word([word])
-            line.append(word)
+            if nsyl(word) <= remaining_syllable_count:
+                line.append(word)
+                remaining_syllable_count -= nsyl(word)
+                i += 1
         if self.reverse:
             line = line[::-1]
         return line
 
-    def create_song(self, couplets, syllables):
+    def create_song(self, couplets, syllable_count):
         song = []
         for i in range(0,couplets):
             rhymewords = set(self.words_to_rhyme[random.choice(self.words_to_rhyme.keys())])
             thisrhymes = random.sample(rhymewords,2)
             startingword1 = thisrhymes[0]
             startingword2 = thisrhymes[1]
-            line1 = self.create_line(startingword1, 5)
-            line2 = self.create_line(startingword2, 5)
+            line1 = self.create_line(startingword1, syllable_count)
+            line2 = self.create_line(startingword2, syllable_count)
             couplet = [line1, line2]
             song.append(couplet)
         return song
