@@ -47,6 +47,9 @@ class MCMarkov():
                 word = self.markovchain.next_word([startingword])
             else:
                 word = self.markovchain.next_word([word])
+            if word == '\n': # If previous word has no following words, backup and start again
+                prevword = line.pop()
+                remaining_syllable_count += nsyl(prevword)
             if nsyl(word) <= remaining_syllable_count:
                 line.append(word)
                 remaining_syllable_count -= nsyl(word)
