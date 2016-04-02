@@ -23,9 +23,11 @@ class DBConfig(object):
 
         if os.path.exists(db_loc + '/rapgenerator.db'):
             os.remove(db_loc + '/rapgenerator.db')
-            return "Database " + db_loc + '/rapgenerator.db' + " successfully destroyed"
+            print "Database " + db_loc + '/rapgenerator.db' + " successfully destroyed"
+            return True
         else:
-            return "No rapgenerator.db database at "+ db_loc
+            print "No rapgenerator.db database at "+ db_loc
+            return False
 
     def db_create(self):
         """
@@ -37,10 +39,11 @@ class DBConfig(object):
 
         if not os.path.exists(db_loc):
             os.makedirs(db_loc)
+        if not os.path.exists(db_loc+'/rapgenerator.db'):
             conn=sqlite3.connect(db_loc+'/rapgenerator.db')
             print "Database created and opened succesfully at " + db_loc + 'rapgenerator.db'
         else:
-            return "ERROR: A rapgenerator db already exists at " + db_loc
+            print "ERROR: A rapgenerator db already exists at " + db_loc
 
         conn.text_factory = str
         c = conn.cursor()
