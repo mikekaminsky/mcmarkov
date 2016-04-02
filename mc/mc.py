@@ -23,7 +23,7 @@ class MCMarkov():
         self.reverse = reverse
         self.markovchain = MarkovChain(self.corpus, n_order)
         self.markovchain.fit()
-        self.starting_words = [line[0] for line in self.corpus]
+        self.starting_words = [line[0] for line in self.corpus if line]
         self.rhymedict = {}
         for word in self.starting_words:
             keys = rhymesyls(word)
